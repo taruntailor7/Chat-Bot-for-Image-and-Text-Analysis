@@ -13,6 +13,7 @@ function ImageAnalysisChatbot() {
   const [tempError, setTempError] = useState('');
   const [analyses, setAnalyses] = useState([]);
   const fileInputRef = useRef();
+  const [analysesLoading, setAnalysesLoading] = useState(true);
 
   useEffect(() => {
     fetchAnalyses();
@@ -28,11 +29,14 @@ function ImageAnalysisChatbot() {
   }, [tempError]);
 
   const fetchAnalyses = async () => {
+    setAnalysesLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/analyses');
+      const response = await axios.get('https://chat-bot-for-image-and-text-analysis.onrender.com/api/analyses');
       setAnalyses(response.data);
     } catch (error) {
       console.error('Error fetching analyses:', error);
+    } finally {
+      setAnalysesLoading(false);
     }
   };
 
@@ -54,7 +58,6 @@ function ImageAnalysisChatbot() {
     }
     return true;
   };
-
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
@@ -82,10 +85,10 @@ function ImageAnalysisChatbot() {
     formData.append('text', text);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/analyze', formData, {
+      const response = await axios.post('https://chat-bot-for-image-and-text-analysis.onrender.com/api/analyze', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-
+      
       setConversation([...conversation, { type: 'user', content: text }, { type: 'bot', content: response.data.analysis }]);
       setText('');
       clearFileInput();
@@ -116,7 +119,11 @@ function ImageAnalysisChatbot() {
       <div className="w-64 bg-white shadow-md overflow-y-auto">
         <div className="p-4">
           <h2 className="text-xl font-bold mb-4">History</h2>
-          <AnalysisHistory analyses={analyses} onSelectAnalysis={handleSelectAnalysis} />
+          <AnalysisHistory 
+            analyses={analyses} 
+            onSelectAnalysis={handleSelectAnalysis} 
+            isLoading={analysesLoading}
+          />
         </div>
       </div>
 

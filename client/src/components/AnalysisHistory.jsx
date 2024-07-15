@@ -1,6 +1,14 @@
 import React from 'react';
 
-function AnalysisHistory({ analyses, onSelectAnalysis }) {
+function AnalysisHistory({ analyses, onSelectAnalysis, isLoading }) {
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <p className="text-gray-500">Loading history...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       {analyses.length > 0 ? (
