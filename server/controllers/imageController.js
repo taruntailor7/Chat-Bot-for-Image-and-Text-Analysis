@@ -68,8 +68,10 @@ exports.analyzeImageAndText = async (req, res) => {
     res.json({ analysis: response, text });
   } catch (error) {
     console.error('Error in analyzeImageAndText:', error);
-    if (error.message === 'File too large') {
-      return res.status(400).json({ error: 'File size is too large. Maximum size is 5MB.' });
+    if (error instanceof multer.MulterError) {
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ error: 'File size is too large. Maximum size is 5MB.' });
+      }
     }
     res.status(500).json({ error: 'An error occurred during image analysis' });
   }
